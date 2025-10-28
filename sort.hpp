@@ -1,23 +1,20 @@
 #pragma once
-#include <algorithm>
-#include <type_traits>
+#include <concepts>
 #include <iterator>
+#include <algorithm>
 
+template <typename Iter, typename Compare>
+concept SortableWithComparator =
+    std::random_access_iterator<Iter> &&
+    std::predicate<Compare, typename std::iterator_traits<Iter>::value_type,
+                          typename std::iterator_traits<Iter>::value_type>;
 
 template <class RandomAccessIterator, class Compare>
+requires SortableWithComparator<RandomAccessIterator, Compare>
 void quick_sort(RandomAccessIterator first, RandomAccessIterator last, Compare comp) {
 
 	//проверка на итератор
 	//проверка комп на круглые скобки
-
-	using category = typename std::iterator_traits<RandomAccessIterator>::iterator_category;
-	static_assert(std::is_base_of<std::random_access_iterator_tag, category>::value,
-		"нужен RandomAccessIterator");
-
-	using value_type = typename std::iterator_traits<RandomAccessIterator>::value_type;
-	static_assert(
-		std::is_invocable_r<bool, Compare, value_type, value_type>::value,
-		"компоратор должен вызываться comp(a, b) и возвращать тип bool");
 
 	if (first >= last || first + 1 == last)
 		return;
@@ -46,4 +43,5 @@ void quick_sort(RandomAccessIterator first, RandomAccessIterator last, Compare c
 
 	if (i < last)
 		quick_sort(i, last, comp);
+
 }
